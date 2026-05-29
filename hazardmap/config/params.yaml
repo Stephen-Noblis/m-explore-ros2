@@ -1,0 +1,30 @@
+hazards:
+  - name: "terrain"
+    topic: "/camera/image_raw"
+    msg_type: "sensor_msgs/Image"          # package/MessageType format
+    metadata:
+      sensor_id: "cam_left"
+      frame_rate: 1000
+      description: "camera stream"
+
+  - name: "elevation"
+    topic: "/sensors/imu_1/data"
+    msg_type: "sensor_msgs/Imu"
+    metadata:
+      sensor_id: "imu_main"
+      calibrated: true
+      description: "Main IMU unit"
+
+  - name: "tilt"
+    topic: "/sensors/imu_1/data"
+    msg_type: "sensor_msgs/Imu"
+    metadata:
+      sensor_id: "imu_main"
+      calibrated: true
+      description: "Main IMU unit"
+
+rover:
+  name: jackal
+  topic: "/j100_0001"
+  gps_topic: "/sensors/gps_0/fix"
+

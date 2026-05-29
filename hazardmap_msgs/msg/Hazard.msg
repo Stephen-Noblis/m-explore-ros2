@@ -1,0 +1,10 @@
+uuid id  
+string type_id  
+uint8 severity  
+float32 confidence  
+builtin_interfaces/Time stamp  
+string frame_id  
+Geometry region  
+interfaces/Time valid_until  
+HazardEvidenceRef[] evidence_refs  
+HazardAttribute[] attributes

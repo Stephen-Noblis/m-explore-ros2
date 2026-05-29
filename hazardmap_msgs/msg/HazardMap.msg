@@ -1,0 +1,11 @@
+string map_id  
+string tile_id  
+float32 resolution  
+sensor_msgs/NavSatFix gps_position
+uint32 width  
+uint32 height  
+string[] layer_names  
+float32[] data  
+string encoding  
+float32[] no_data_values  
+builtin_interfaces/Time stamp

@@ -1,0 +1,48 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="namespace" default="j100_0001"/>
+  <arg name="setup_path" default="/ws/src/m-explore-ros2/clearpath/jackal/"/>
+  <arg name="use_nav2" default="true"/>
+  <arg name="use_rviz" default="true"/>
+
+  <!-- Environment fixes that mattered in your setup -->
+  <set_env name="RMW_IMPLEMENTATION" value="rmw_cyclonedds_cpp"/>
+  <set_env name="ROS_DOMAIN_ID" value="0"/>
+  <set_env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>
+  <set_env name="QT_X11_NO_MITSHM" value="1"/>
+
+  <!-- Launch Clearpath Nav2 -->
+  <include
+    file="$(find-pkg-share clearpath_nav2_demos)/launch/nav2.launch.py"
+    if="$(var use_nav2)">
+    <arg name="setup_path" value="$(var setup_path)"/>
+    <arg name="namespace" value="$(var namespace)"/>
+  </include>
+
+  <!-- Republish the Nav2 local costmap OccupancyGrid onto a clean topic -->
+  <node
+    pkg="jackal_costmap_viz"
+    exec="costmap_republisher"
+    name="costmap_republisher"
+    output="screen">
+    <param
+      name="input_topic"
+      value="/$(var namespace)/local_costmap/costmap"/>
+    <param
+      name="output_topic"
+      value="/$(var namespace)/local_costmap/occupancy_grid"/>
+  </node>
+
+  <!-- Launch RViz using the robot's namespaced TF topics -->
+  <node
+    pkg="rviz2"
+    exec="rviz2"
+    name="rviz2"
+    output="screen"
+    if="$(var use_rviz)">
+
+    <remap from="/tf" to="/$(var namespace)/tf"/>
+    <remap from="/tf_static" to="/$(var namespace)/tf_static"/>
+  </node>
+
+</launch>

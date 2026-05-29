@@ -1,0 +1,31 @@
+serial_number: a300-0001
+version: 0
+
+system:
+  hosts:
+    - hostname: a300-0001
+      ip: 127.0.0.1
+  ros2:
+    namespace: a300_0001
+  workspaces:
+    - /root/clearpath_ws/install/setup.bash
+
+platform:
+  enable_ekf: true
+
+sensors:
+  imu:
+    - model: microstrain_imu
+      urdf_enabled: true
+      launch_enabled: true
+      parent: base_link
+      xyz: [0.0, 0.0, 0.15]
+      rpy: [0.0, 0.0, 0.0]
+
+  lidar2d:
+    - model: hokuyo_ust
+      urdf_enabled: true
+      launch_enabled: true
+      parent: base_link
+      xyz: [0.25, 0.0, 0.25]
+      rpy: [0.0, 0.0, 0.0]

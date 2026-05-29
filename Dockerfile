@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-rosdep \
     python3-colcon-common-extensions \
     python3-vcstool \
+    python3-pip \
     git \
     curl \
     wget \
@@ -56,7 +57,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-slam-toolbox \
     "ros-${ROS_DISTRO}-turtlebot3*" \
     ros-${ROS_DISTRO}-turtlebot3-gazebo \
+    ros-humble-grid-map \
+    ros-humble-grid-map-msgs \
+    ros-humble-grid-map-ros \
+    ros-humble-grid-map-rviz-plugin \
+    ros-humble-grid-map-visualization \
   && rm -rf /var/lib/apt/lists/*
+
 
 # Install clearpath simulator for Husky / Jackal simulation
 RUN apt-get update && apt-get install -y wget && \
@@ -65,6 +72,19 @@ RUN apt-get update && apt-get install -y wget && \
     apt-get update && \
     apt-get install -y ignition-fortress ros-${ROS_DISTRO}-clearpath-simulator && \
     rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-clearpath-simulator \
+    ros-${ROS_DISTRO}-clearpath-nav2-demos \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create directories inside container
+RUN mkdir -p /root/clearpath_jackal \
+  && mkdir -p /root/clearpath_husky
+
+# Copy configs into container
+COPY clearpath/jackal/robot.yaml /root/clearpath_jackal/robot.yaml
+COPY clearpath/husky/robot.yaml /root/clearpath_husky/robot.yaml
     
 RUN apt-get update && apt-get install -y --no-install-recommends \
   ros-humble-clearpath-simulator
@@ -80,6 +100,10 @@ RUN apt-get update && \
     rosdep install --from-paths src --ignore-src -r -y --rosdistro ${ROS_DISTRO} && \
     colcon build --symlink-install && \
     rm -rf /var/lib/apt/lists/*
+
+  
+# install Python requirements
+RUN pip3 install --no-cache-dir -r /ws/src/m-explore-ros2/hazardmap/requirements.txt
 
 # noVNC helper symlink commonly used by launch scripts
 RUN ln -sf /usr/share/novnc/vnc.html /usr/share/novnc/index.html

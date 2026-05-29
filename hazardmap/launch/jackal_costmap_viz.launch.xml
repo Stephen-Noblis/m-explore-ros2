@@ -1,0 +1,51 @@
+
+<launch>
+  <!-- Arguments -->
+  <arg name="namespace" default="j100_0001"/>
+  <arg name="setup_path" default="/ws/src/m-explore-ros2/clearpath/jackal/"/>
+
+  <arg name="use_sim" default="true"/>
+  <arg name="use_slam" default="true"/>
+  <arg name="use_rviz" default="true"/>
+
+  <!-- Environment variables that fixed Docker/DDS/RViz discovery -->
+  <set_env name="ROS_DOMAIN_ID" value="0"/>
+  <set_env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>
+  <set_env name="QT_X11_NO_MITSHM" value="1"/>
+
+  <!-- 1. Start the Clearpath Jackal simulation.
+       Publishes robot_state_publisher, EKF, odom bridge,
+       lidar bridge, /j100_0001/tf, and /j100_0001/tf_static. -->
+  <include
+    file="$(find-pkg-share clearpath_gz)/launch/simulation.launch.py"
+    if="$(var use_sim)">
+    <arg name="setup_path" value="$(var setup_path)"/>
+  </include>
+
+  <!-- 2. Start SLAM Toolbox + Nav2.
+       slam.launch.py provides the map→odom transform via SLAM Toolbox
+       and launches Nav2 for path planning and navigation. -->
+  <timer period="5.0">
+    <include
+      file="$(find-pkg-share clearpath_nav2_demos)/launch/slam.launch.py"
+      if="$(var use_slam)">
+      <arg name="setup_path" value="$(var setup_path)"/>
+      <arg name="namespace" value="$(var namespace)"/>
+    </include>
+  </timer>
+
+  <!-- 3. Start RViz with the namespaced Clearpath TF topics remapped. -->
+  <timer period="7.0">
+    <node
+      pkg="rviz2"
+      exec="rviz2"
+      name="rviz2"
+      output="screen"
+      if="$(var use_rviz)">
+
+      <remap from="/tf" to="/$(var namespace)/tf"/>
+      <remap from="/tf_static" to="/$(var namespace)/tf_static"/>
+    </node>
+  </timer>
+</launch>
+
